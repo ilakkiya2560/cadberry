@@ -7,59 +7,56 @@ export default {
   theme: {
     extend: {
       colors: {
-        cadberry: {
-          50: '#f5f3ff',
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6',
-          600: '#7c3aed',
-          700: '#6d28d9',
-          800: '#5b21b6',
-          900: '#4c1d95',
-          950: '#2e1065',
+        cream: {
+          50: '#FDFBF7',
+          100: '#FAF7F2',
+          200: '#F4EFEA',
+          300: '#ECE4DC',
+          400: '#DFD5C8',
+          500: '#C8BBAA',
         },
-        calm: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          200: '#99f6e4',
-          300: '#5eead4',
-          400: '#2dd4bf',
-          500: '#14b8a6',
-          600: '#0d9488',
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
+        lavender: {
+          50: '#FAF7FD',
+          100: '#F3ECF8',
+          200: '#EADDF2',
+          300: '#DBC5EB',
+          400: '#C1A2D6',
+          500: '#9E77BA',
+          600: '#7E6390',
+          700: '#644D73',
+          800: '#4B3857',
         },
-        warmth: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
+        mutedTeal: {
+          50: '#F2F8F8',
+          100: '#E3EFEF',
+          200: '#C7DFDE',
+          500: '#457B79',
+          600: '#3D706E',
+          700: '#2F5957',
+          800: '#234442',
+        },
+        salmon: {
+          50: '#FFF7F5',
+          100: '#FCEEEA',
+          200: '#F8DBD4',
+          300: '#F2BDB3',
+          400: '#E48F82',
+          700: '#BA5344',
+          800: '#943D30',
+        },
+        editorial: {
+          text: '#2D2A26',
+          muted: '#78726A',
+          faint: '#A69F96',
+          border: '#EAE4DC',
+          card: '#FAF7F2',
         }
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        display: ['Outfit', 'sans-serif'],
+        serif: ['Newsreader', 'Lora', 'Georgia', 'serif'],
+        display: ['Newsreader', 'Georgia', 'serif'],
       },
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'float': 'float 4s ease-in-out infinite',
-        'ripple': 'ripple 2s linear infinite',
-      },
-      keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-8px)' },
-        },
-        ripple: {
-          '0%': { transform: 'scale(0.8)', opacity: '1' },
-          '100%': { transform: 'scale(2.2)', opacity: '0' },
-        }
-      }
     },
   },
   plugins: [],

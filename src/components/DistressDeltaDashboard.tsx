@@ -4,12 +4,9 @@ import {
   TrendingUp,
   Activity,
   Moon,
-  Calendar,
-  Sparkles,
-  Flame,
   ShieldCheck,
   PlusCircle,
-  Clock
+  Menu
 } from 'lucide-react';
 import { DistressMetrics, StudentCheckIn } from '../types';
 
@@ -18,215 +15,219 @@ interface DistressDeltaDashboardProps {
   metrics: DistressMetrics;
   onOpenCheckInModal: () => void;
   onOpenBreathingModal: () => void;
+  onOpenMobileSidebar?: () => void;
 }
 
 export const DistressDeltaDashboard: React.FC<DistressDeltaDashboardProps> = ({
   checkIns,
   metrics,
   onOpenCheckInModal,
-  onOpenBreathingModal,
+  onOpenMobileSidebar,
 }) => {
   const isImproving = metrics.distressDeltaPercent <= 0;
 
-  // Emotion count breakdown
-  const emotionCounts: Record<string, number> = {};
-  checkIns.forEach((c) => {
-    emotionCounts[c.emotion] = (emotionCounts[c.emotion] || 0) + 1;
-  });
-
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-6 animate-fade-in">
-      {/* Dashboard Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs">
-        <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
-            Personal Wellbeing Intelligence
+    <div className="flex-1 flex flex-col h-screen max-w-5xl mx-auto px-4 sm:px-8 py-6 overflow-y-auto space-y-6">
+      {/* Top Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-[#EAE4DC]/60 shrink-0">
+        <div className="flex items-center gap-3">
+          {onOpenMobileSidebar && (
+            <button
+              onClick={onOpenMobileSidebar}
+              className="p-1.5 rounded-lg text-[#78726A] hover:bg-[#F4EFEA] md:hidden"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+          <span className="text-xs font-semibold tracking-[0.18em] text-[#78726A] uppercase">
+            YOUR SPACE · MY PATTERNS
           </span>
-          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-800 mt-2">
-            My Distress Delta & Longitudinal Baseline
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Measuring real progress week-over-week, not just daily app engagement.
-          </p>
         </div>
 
         <button
           onClick={onOpenCheckInModal}
-          className="flex items-center justify-center gap-2 px-5 py-3 bg-teal-700 hover:bg-teal-800 text-white rounded-2xl font-semibold text-sm transition shadow-md shadow-teal-700/20"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#2F5957] hover:bg-[#234442] text-white text-xs font-medium transition shadow-2xs"
         >
-          <PlusCircle className="w-4 h-4" />
-          <span>New Voice Check-in</span>
+          <PlusCircle className="w-3.5 h-3.5" />
+          <span>New Check-in</span>
         </button>
       </div>
 
-      {/* Top 3 Metric Cards */}
+      {/* Page Title */}
+      <div>
+        <h2 className="font-serif text-3xl sm:text-4xl text-[#2D2A26] font-normal tracking-tight">
+          My Wellbeing Patterns
+        </h2>
+        <p className="font-sans text-sm text-[#78726A] font-light mt-1.5">
+          Longitudinal baseline and Distress Delta over time
+        </p>
+      </div>
+
+      {/* 3 Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Metric 1: Distress Delta Score */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Distress Delta */}
+        <div className="bg-white rounded-2xl p-5 border border-[#EAE4DC] shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[#78726A] uppercase tracking-wider">
               Distress Delta (7-Day)
             </span>
             <div
-              className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                isImproving
-                  ? 'bg-emerald-50 text-emerald-600'
-                  : 'bg-amber-50 text-amber-600'
+              className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                isImproving ? 'bg-[#F2F8F8] text-[#2F5957]' : 'bg-[#FFF7F5] text-[#BA5344]'
               }`}
             >
-              {isImproving ? <TrendingDown className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />}
+              {isImproving ? <TrendingDown className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
             </div>
           </div>
 
           <div className="my-3">
             <div
-              className={`text-4xl font-display font-extrabold tracking-tight ${
-                isImproving ? 'text-emerald-700' : 'text-amber-700'
+              className={`text-3xl font-serif font-medium ${
+                isImproving ? 'text-[#2F5957]' : 'text-[#BA5344]'
               }`}
             >
               {metrics.distressDeltaPercent > 0
                 ? `+${metrics.distressDeltaPercent}%`
                 : `${metrics.distressDeltaPercent}%`}
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#78726A] mt-1 font-light">
               {isImproving
-                ? 'Stress levels have decreased compared to your initial baseline.'
-                : 'Slight increase in strain detected; take extra care with sleep.'}
+                ? 'Stress levels lower compared to your initial baseline.'
+                : 'Slight increase in strain; ensure gentle rest.'}
             </p>
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-400">Status:</span>
+          <div className="pt-2.5 border-t border-[#EAE4DC]/60 flex items-center justify-between text-[11px]">
+            <span className="text-[#A69F96]">Trend:</span>
             <span
-              className={`font-semibold ${
+              className={`font-medium ${
                 metrics.baselineComparison === 'improving'
-                  ? 'text-emerald-700'
+                  ? 'text-[#2F5957]'
                   : metrics.baselineComparison === 'needs_care'
-                  ? 'text-amber-700'
-                  : 'text-slate-700'
+                  ? 'text-[#BA5344]'
+                  : 'text-[#78726A]'
               }`}
             >
               {metrics.baselineComparison === 'improving'
-                ? 'Healthy Recovery Trend'
+                ? 'Recovery trend'
                 : metrics.baselineComparison === 'needs_care'
-                ? 'High Strain Alert'
-                : 'Steady Baseline'}
+                ? 'High strain'
+                : 'Steady baseline'}
             </span>
           </div>
         </div>
 
-        {/* Metric 2: Average Stress Level */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Current Stress Index */}
+        <div className="bg-white rounded-2xl p-5 border border-[#EAE4DC] shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[#78726A] uppercase tracking-wider">
               Current Stress Index
             </span>
-            <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-              <Activity className="w-5 h-5" />
+            <div className="w-7 h-7 rounded-lg bg-[#F3ECF8] text-[#644D73] flex items-center justify-center">
+              <Activity className="w-4 h-4" />
             </div>
           </div>
 
           <div className="my-3">
-            <div className="text-4xl font-display font-extrabold text-slate-800 tracking-tight">
+            <div className="text-3xl font-serif font-medium text-[#2D2A26]">
               {metrics.current7dAvgStress}{' '}
-              <span className="text-xl font-normal text-slate-400">/ 10</span>
+              <span className="text-lg font-normal text-[#A69F96]">/ 10</span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#78726A] mt-1 font-light">
               Initial baseline was {metrics.previous7dAvgStress}/10.
             </p>
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-400">Safety Net Status:</span>
-            <span className="font-semibold text-emerald-700 flex items-center gap-1">
+          <div className="pt-2.5 border-t border-[#EAE4DC]/60 flex items-center justify-between text-[11px]">
+            <span className="text-[#A69F96]">Safety Net:</span>
+            <span className="font-medium text-[#2F5957] flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Normal Bounds</span>
+              <span>Normal bounds</span>
             </span>
           </div>
         </div>
 
-        {/* Metric 3: Student Consistency & Sleep */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Check-in Streak */}
+        <div className="bg-white rounded-2xl p-5 border border-[#EAE4DC] shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Mindfulness Habit
+            <span className="text-xs font-semibold text-[#78726A] uppercase tracking-wider">
+              Check-in Habit
             </span>
-            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <Flame className="w-5 h-5 text-amber-500" />
+            <div className="w-7 h-7 rounded-lg bg-[#F4EFEA] text-[#78726A] flex items-center justify-center">
+              <Moon className="w-4 h-4" />
             </div>
           </div>
 
           <div className="my-3">
-            <div className="text-4xl font-display font-extrabold text-slate-800 tracking-tight">
+            <div className="text-3xl font-serif font-medium text-[#2D2A26]">
               {metrics.currentStreakDays}{' '}
-              <span className="text-xl font-normal text-slate-400">Days</span>
+              <span className="text-lg font-normal text-[#A69F96]">Days</span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Active check-in streak logging voice reflections with Cadberry.
+            <p className="text-xs text-[#78726A] mt-1 font-light">
+              Consistent reflections logged with Cadberry.
             </p>
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-400">Total Check-ins:</span>
-            <span className="font-semibold text-slate-800">{metrics.checkInCount} sessions</span>
+          <div className="pt-2.5 border-t border-[#EAE4DC]/60 flex items-center justify-between text-[11px]">
+            <span className="text-[#A69F96]">Total Check-ins:</span>
+            <span className="font-medium text-[#2D2A26]">{metrics.checkInCount} sessions</span>
           </div>
         </div>
       </div>
 
-      {/* Longitudinal Graph: Stress vs Sleep Over Time */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
+      {/* Trajectory Bar Chart */}
+      <div className="bg-white rounded-2xl p-6 border border-[#EAE4DC] shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 className="font-display font-bold text-lg text-slate-800">
-              Longitudinal Stress vs. Sleep Trajectory
+            <h3 className="font-serif font-medium text-lg text-[#2D2A26]">
+              Stress vs. Sleep Trajectory
             </h3>
-            <p className="text-xs text-slate-500">
-              Correlating sleep restoration with lower stress biomarkers across your check-ins
+            <p className="text-xs text-[#78726A] font-light mt-0.5">
+              Comparing daily stress ratings with restful sleep hours
             </p>
           </div>
 
-          <div className="flex items-center gap-4 text-xs font-medium">
+          <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-teal-600" />
-              <span className="text-slate-600">Stress Score (1-10)</span>
+              <div className="w-2.5 h-2.5 rounded-xs bg-[#3D706E]" />
+              <span className="text-[#78726A]">Stress (1-10)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-purple-400" />
-              <span className="text-slate-600">Sleep (Hours)</span>
+              <div className="w-2.5 h-2.5 rounded-xs bg-[#C1A2D6]" />
+              <span className="text-[#78726A]">Sleep (Hrs)</span>
             </div>
           </div>
         </div>
 
-        {/* Visual Bar & Trend Chart */}
-        <div className="h-64 flex items-end justify-between gap-2 sm:gap-4 pt-8 pb-2 border-b border-slate-200">
+        {/* Chart Bars */}
+        <div className="h-52 flex items-end justify-between gap-2 sm:gap-4 pt-6 pb-2 border-b border-[#EAE4DC]">
           {checkIns.map((item, idx) => {
             const stressHeight = (item.stressScore / 10) * 100;
             const sleepHeight = (item.sleepHours / 10) * 100;
 
             return (
-              <div key={item.id || idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group relative">
-                {/* Hover Tooltip */}
-                <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-slate-900 text-white text-[11px] rounded-xl p-2.5 shadow-xl z-20 w-44 pointer-events-none">
-                  <div className="font-bold">{item.dayLabel}</div>
-                  <div className="text-teal-300">Stress: {item.stressScore} / 10</div>
-                  <div className="text-purple-300">Sleep: {item.sleepHours} hrs</div>
-                  <div className="text-slate-300 mt-1 text-[10px] line-clamp-2">"{item.note}"</div>
+              <div key={item.id || idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group relative">
+                {/* Tooltip */}
+                <div className="absolute bottom-full mb-1.5 hidden group-hover:flex flex-col bg-[#2D2A26] text-white text-[11px] rounded-lg p-2 shadow-lg z-20 w-40 pointer-events-none">
+                  <div className="font-medium">{item.dayLabel}</div>
+                  <div className="text-[#99F6E4]">Stress: {item.stressScore} / 10</div>
+                  <div className="text-[#EADDF2]">Sleep: {item.sleepHours} hrs</div>
+                  {item.note && <div className="text-[#C8BBAA] mt-1 text-[10px] truncate">"{item.note}"</div>}
                 </div>
 
                 {/* Bars */}
                 <div className="w-full flex items-end justify-center gap-1 sm:gap-2 h-full">
                   <div
                     style={{ height: `${stressHeight}%` }}
-                    className="w-3 sm:w-5 bg-gradient-to-t from-teal-700 to-teal-500 rounded-t-md transition-all duration-500 group-hover:brightness-110"
+                    className="w-2.5 sm:w-4 bg-[#3D706E] rounded-t-xs transition-all duration-300"
                   />
                   <div
                     style={{ height: `${sleepHeight}%` }}
-                    className="w-3 sm:w-5 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t-md transition-all duration-500 group-hover:brightness-110"
+                    className="w-2.5 sm:w-4 bg-[#C1A2D6] rounded-t-xs transition-all duration-300"
                   />
                 </div>
 
-                {/* Label */}
-                <span className="text-[11px] font-semibold text-slate-500 mt-1">
+                <span className="text-[10px] text-[#A69F96] mt-1 font-medium">
                   {item.dayLabel}
                 </span>
               </div>
@@ -235,44 +236,50 @@ export const DistressDeltaDashboard: React.FC<DistressDeltaDashboardProps> = ({
         </div>
       </div>
 
-      {/* Recent Check-ins History Table */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
-        <h3 className="font-display font-bold text-lg text-slate-800">
-          Check-in Log & Voice Notes History
+      {/* History Log */}
+      <div className="bg-white rounded-2xl p-6 border border-[#EAE4DC] shadow-2xs space-y-3">
+        <h3 className="font-serif font-medium text-lg text-[#2D2A26]">
+          Check-in History
         </h3>
 
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-[#EAE4DC]/60">
           {checkIns.slice().reverse().map((record) => (
-            <div key={record.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-800">{record.dayLabel}</span>
-                  <span className="text-xs text-slate-400">•</span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-medium">
+            <div key={record.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-semibold text-[#2D2A26]">{record.dayLabel}</span>
+                  <span className="text-[#A69F96]">•</span>
+                  <span className="px-2 py-0.5 rounded-md bg-[#F3ECF8] text-[#644D73] font-medium text-[10px]">
                     {record.emotion}
                   </span>
-                  <span className="text-xs text-slate-400 uppercase font-bold text-[10px]">
-                    [{record.language}]
-                  </span>
+                  <span className="text-[10px] text-[#A69F96] uppercase">[{record.language}]</span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-600 italic">
-                  "{record.note}"
-                </p>
+                {record.note && (
+                  <p className="text-xs text-[#78726A] font-light italic">
+                    "{record.note}"
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center gap-4 text-xs shrink-0">
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Stress:</span>
-                  <span className="font-bold text-slate-800">{record.stressScore}/10</span>
+                <div className="text-right">
+                  <span className="text-[10px] text-[#A69F96] block">Stress</span>
+                  <span className="font-medium text-[#2D2A26]">{record.stressScore}/10</span>
                 </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Sleep:</span>
-                  <span className="font-bold text-slate-800">{record.sleepHours}h</span>
+                <div className="text-right">
+                  <span className="text-[10px] text-[#A69F96] block">Sleep</span>
+                  <span className="font-medium text-[#2D2A26]">{record.sleepHours}h</span>
                 </div>
-                <div>
-                  <span className="text-slate-400 block text-[10px]">Distress Δ:</span>
-                  <span className={`font-extrabold ${(record.distressDelta || 0) <= 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
-                    {record.distressDelta && record.distressDelta > 0 ? `+${record.distressDelta}%` : `${record.distressDelta || 0}%`}
+                <div className="text-right">
+                  <span className="text-[10px] text-[#A69F96] block">Delta</span>
+                  <span
+                    className={`font-semibold ${
+                      (record.distressDelta || 0) <= 0 ? 'text-[#2F5957]' : 'text-[#BA5344]'
+                    }`}
+                  >
+                    {record.distressDelta && record.distressDelta > 0
+                      ? `+${record.distressDelta}%`
+                      : `${record.distressDelta || 0}%`}
                   </span>
                 </div>
               </div>

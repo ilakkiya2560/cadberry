@@ -40,6 +40,8 @@ CORE MISSION & ETHICAL SAFETY RULES:
      "cadberryVoiceNotes": <1 sentence guidance on vocal tone>
    }`;
 
+const GEMINI_MODEL_NAME = 'gemini-3.6-flash';
+
 export async function askCadberry(
   userText: string,
   language: Language,
@@ -79,7 +81,7 @@ export async function askCadberry(
       });
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: GEMINI_MODEL_NAME,
         contents,
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,

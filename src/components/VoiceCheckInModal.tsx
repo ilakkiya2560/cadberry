@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mic, MicOff, CheckCircle2, RefreshCw, Volume2, Sparkles, Play, Square } from 'lucide-react';
+import { Mic, CheckCircle2, RefreshCw, Square, X } from 'lucide-react';
 import { Language, PrimaryEmotion, StudentCheckIn } from '../types';
 import { voiceService } from '../services/voiceService';
 import { askCadberry } from '../services/geminiService';
@@ -97,113 +97,88 @@ export const VoiceCheckInModal: React.FC<VoiceCheckInModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 flex flex-col gap-6 relative">
-        {/* Modal Header */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-xs animate-fade-in">
+      <div className="bg-[#FAF7F2] rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-xl border border-[#EAE4DC] flex flex-col gap-5 relative">
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700">
-              <Mic className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-display font-bold text-lg text-slate-800">
-                Daily 60s Voice Check-in
-              </h3>
-              <p className="text-xs text-slate-500">
-                Speak freely in your preferred language • AI extracts wellness cues
-              </p>
-            </div>
+          <div>
+            <h3 className="font-serif font-medium text-2xl text-[#2D2A26]">
+              Voice Check-in
+            </h3>
+            <p className="text-xs text-[#78726A] font-light mt-0.5">
+              Reflect in your own words for 30–90 seconds
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-700 p-2 rounded-xl text-lg font-bold"
+            className="text-[#A69F96] hover:text-[#2D2A26] p-1.5 rounded-lg"
           >
-            ✕
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {!completedRecord ? (
           <>
             {/* Guide Text */}
-            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-xs sm:text-sm text-slate-600 leading-relaxed">
-              <p className="font-semibold text-slate-800 mb-1">
-                Share what’s on your mind today:
+            <div className="bg-[#F3ECF8] border border-[#EADDF2] rounded-2xl p-4 text-xs text-[#644D73] leading-relaxed">
+              <p className="font-medium text-[#4B3857] mb-1">
+                A few thoughts you might explore:
               </p>
-              <ul className="list-disc pl-4 space-y-1 text-slate-500 text-xs">
-                <li>How did you sleep last night?</li>
-                <li>How are your classes, projects, or semester deadlines feeling?</li>
-                <li>Any moments of pressure, loneliness, or relief today?</li>
+              <ul className="list-disc pl-4 space-y-0.5 text-xs text-[#644D73]">
+                <li>How rested did your body feel when waking up?</li>
+                <li>Any deadlines or conversations lingering in your thoughts?</li>
+                <li>What do you need right now to feel a little more at ease?</li>
               </ul>
             </div>
 
-            {/* Central Recording Control & Waveform */}
-            <div className="flex flex-col items-center justify-center py-6 bg-teal-50/40 border border-teal-100 rounded-3xl gap-4">
-              <div className="relative">
-                {isRecording && (
-                  <div className="absolute inset-0 rounded-full bg-teal-400/30 animate-ping" />
+            {/* Recording Button */}
+            <div className="flex flex-col items-center justify-center py-6 bg-white border border-[#EAE4DC] rounded-2xl gap-3">
+              <button
+                onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+                disabled={isProcessing}
+                className={`w-16 h-16 rounded-full flex items-center justify-center text-white transition-all shadow-xs ${
+                  isRecording
+                    ? 'bg-[#BA5344] scale-105'
+                    : 'bg-[#2F5957] hover:bg-[#234442]'
+                }`}
+              >
+                {isRecording ? (
+                  <Square className="w-6 h-6 fill-current" />
+                ) : (
+                  <Mic className="w-6 h-6" />
                 )}
-                <button
-                  onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
-                  disabled={isProcessing}
-                  className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center text-white transition-all shadow-lg ${
-                    isRecording
-                      ? 'bg-rose-500 shadow-rose-400/40 scale-105'
-                      : 'bg-teal-700 hover:bg-teal-800 shadow-teal-700/30'
-                  }`}
-                >
-                  {isRecording ? (
-                    <Square className="w-8 h-8 fill-current" />
-                  ) : (
-                    <Mic className="w-8 h-8" />
-                  )}
-                </button>
-              </div>
+              </button>
 
               <div className="text-center">
-                <div className="text-sm font-bold text-slate-800">
+                <div className="text-xs font-medium text-[#2D2A26]">
                   {isRecording
                     ? `Recording: 0:${seconds < 10 ? '0' : ''}${seconds}`
-                    : 'Tap to Record Voice Note'}
+                    : 'Click to start voice reflection'}
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {isRecording ? 'Click to stop & analyze' : 'Aim for 30–90 seconds'}
+                <p className="text-[11px] text-[#A69F96] mt-0.5 font-light">
+                  {isRecording ? 'Click to finish' : 'Take your time'}
                 </p>
               </div>
-
-              {/* Simulated Audio Waveform when recording */}
-              {isRecording && (
-                <div className="flex items-center gap-1.5 h-8">
-                  {[40, 75, 55, 90, 65, 80, 45, 95, 70, 50, 85, 60].map((h, i) => (
-                    <div
-                      key={i}
-                      style={{ height: `${h}%` }}
-                      className="w-1 bg-teal-600 rounded-full animate-pulse"
-                    />
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* Transcript Preview */}
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">
-                Live Speech-to-Text Transcript:
+              <label className="text-xs font-medium text-[#78726A]">
+                Transcript:
               </label>
               <textarea
                 value={transcript}
                 onChange={(e) => setTranscript(e.target.value)}
                 rows={3}
-                placeholder="Your voice notes will appear here automatically, or you can type directly..."
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-teal-500"
+                placeholder="Spoken words will appear here, or you may write directly..."
+                className="w-full bg-white border border-[#EAE4DC] rounded-xl p-3 text-xs sm:text-sm text-[#2D2A26] placeholder-[#A69F96] focus:outline-hidden focus:border-[#3D706E]"
               />
             </div>
 
-            {/* Estimated Sleep input slider */}
-            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/70 flex items-center justify-between gap-4">
-              <div>
-                <span className="text-xs font-bold text-slate-700">Hours Slept Last Night:</span>
-                <span className="text-xs text-teal-800 font-extrabold ml-2">{sleepHoursInput} hrs</span>
-              </div>
+            {/* Sleep slider */}
+            <div className="bg-white p-3 rounded-xl border border-[#EAE4DC] flex items-center justify-between gap-4">
+              <span className="text-xs text-[#78726A]">Hours slept:</span>
+              <span className="text-xs font-semibold text-[#2D2A26]">{sleepHoursInput} hrs</span>
               <input
                 type="range"
                 min="2"
@@ -211,116 +186,93 @@ export const VoiceCheckInModal: React.FC<VoiceCheckInModalProps> = ({
                 step="0.5"
                 value={sleepHoursInput}
                 onChange={(e) => setSleepHoursInput(parseFloat(e.target.value))}
-                className="accent-teal-600 cursor-pointer"
+                className="accent-[#2F5957] cursor-pointer"
               />
             </div>
 
-            {/* Fast Presets for Quick Testing without Mic */}
+            {/* Sample presets */}
             <div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-                Quick Test Samples:
+              <span className="text-[11px] text-[#A69F96] font-medium block mb-1">
+                Sample reflection:
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {STUDENT_SAMPLE_PRESETS.slice(0, 3).map((p) => (
+                {STUDENT_SAMPLE_PRESETS.slice(0, 2).map((p) => (
                   <button
                     key={p.id}
                     onClick={() => applyPreset(p)}
-                    className="px-2.5 py-1 bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-900 border border-slate-200 rounded-lg text-xs font-medium transition"
+                    className="px-2.5 py-1 bg-white hover:bg-[#F4EFEA] text-[#78726A] border border-[#EAE4DC] rounded-lg text-xs transition"
                   >
-                    {p.title} ({p.lang})
+                    {p.title}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Manual submit button if typed */}
+            {/* Submit if typed */}
             {transcript.trim() && !isRecording && (
               <button
                 onClick={() => processAndSave(transcript.trim())}
                 disabled={isProcessing}
-                className="w-full py-3 bg-teal-700 hover:bg-teal-800 text-white rounded-xl font-semibold text-sm transition shadow-md flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-[#2F5957] hover:bg-[#234442] text-white rounded-xl font-medium text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-2xs"
               >
                 {isProcessing ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Extracting Stress & Sleep Biomarkers...</span>
+                    <span>Reflecting...</span>
                   </>
                 ) : (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    <span>Analyze & Log Check-in</span>
-                  </>
+                  <span>Save Check-in</span>
                 )}
               </button>
             )}
           </>
         ) : (
-          /* Check-in Logged Successfully Screen */
-          <div className="py-6 flex flex-col items-center text-center gap-4 animate-fade-in">
-            <div className="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/10">
-              <CheckCircle2 className="w-9 h-9" />
+          /* Check-in Logged */
+          <div className="py-4 flex flex-col items-center text-center gap-3 animate-fade-in">
+            <div className="w-12 h-12 rounded-full bg-[#F2F8F8] text-[#2F5957] flex items-center justify-center">
+              <CheckCircle2 className="w-7 h-7" />
             </div>
 
-            <div>
-              <h4 className="font-display font-bold text-xl text-slate-800">
-                Check-in Logged with Cadberry!
-              </h4>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-sm">
-                Your voice signals have been analyzed and added to your personal Distress Delta baseline.
-              </p>
-            </div>
+            <h4 className="font-serif font-medium text-xl text-[#2D2A26]">
+              Check-in Logged
+            </h4>
 
-            <div className="w-full bg-slate-50 border border-slate-200/80 rounded-2xl p-4 text-left grid grid-cols-2 gap-4 my-2">
+            <div className="w-full bg-white border border-[#EAE4DC] rounded-2xl p-4 text-left grid grid-cols-2 gap-3 my-1">
               <div>
-                <span className="text-[11px] font-semibold text-slate-400 uppercase">
-                  Stress Detected
+                <span className="text-[10px] text-[#A69F96] uppercase block">Stress</span>
+                <span className="text-base font-semibold text-[#2D2A26]">
+                  {completedRecord.stressScore}/10
                 </span>
-                <div className="text-lg font-extrabold text-slate-800">
-                  {completedRecord.stressScore} / 10
-                </div>
               </div>
-
               <div>
-                <span className="text-[11px] font-semibold text-slate-400 uppercase">
-                  Primary Emotion
-                </span>
-                <div className="text-lg font-extrabold text-teal-800">
+                <span className="text-[10px] text-[#A69F96] uppercase block">Emotion</span>
+                <span className="text-base font-semibold text-[#644D73]">
                   {completedRecord.emotion}
-                </div>
-              </div>
-
-              <div>
-                <span className="text-[11px] font-semibold text-slate-400 uppercase">
-                  Sleep Recorded
                 </span>
-                <div className="text-base font-bold text-slate-700">
-                  {completedRecord.sleepHours} hrs
-                </div>
               </div>
-
               <div>
-                <span className="text-[11px] font-semibold text-slate-400 uppercase">
-                  Distress Delta
-                </span>
-                <div
-                  className={`text-base font-extrabold ${
-                    (completedRecord.distressDelta || 0) <= 0
-                      ? 'text-emerald-600'
-                      : 'text-amber-600'
+                <span className="text-[10px] text-[#A69F96] uppercase block">Sleep</span>
+                <span className="text-xs text-[#78726A]">{completedRecord.sleepHours} hrs</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-[#A69F96] uppercase block">Distress Delta</span>
+                <span
+                  className={`text-xs font-semibold ${
+                    (completedRecord.distressDelta || 0) <= 0 ? 'text-[#2F5957]' : 'text-[#BA5344]'
                   }`}
                 >
                   {completedRecord.distressDelta && completedRecord.distressDelta > 0
                     ? `+${completedRecord.distressDelta}%`
                     : `${completedRecord.distressDelta || 0}%`}
-                </div>
+                </span>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="w-full py-3 bg-teal-700 hover:bg-teal-800 text-white rounded-xl font-semibold text-sm transition shadow-md"
+              className="w-full py-2.5 bg-[#2F5957] hover:bg-[#234442] text-white rounded-xl font-medium text-xs sm:text-sm transition shadow-2xs"
             >
-              Done & View Wellness Dashboard
+              Close
             </button>
           </div>
         )}

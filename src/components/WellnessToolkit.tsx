@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Wind, Eye, Compass, Moon, Play, Pause, RotateCcw, CheckCircle } from 'lucide-react';
+import { Wind, Eye, Moon, Play, Pause, RotateCcw, Menu } from 'lucide-react';
 
-export const WellnessToolkit: React.FC = () => {
+interface WellnessToolkitProps {
+  onOpenMobileSidebar?: () => void;
+}
+
+export const WellnessToolkit: React.FC<WellnessToolkitProps> = ({ onOpenMobileSidebar }) => {
   const [activeExercise, setActiveExercise] = useState<'breathing' | 'grounding' | 'routine'>('breathing');
 
   // Box Breathing States
@@ -33,117 +37,127 @@ export const WellnessToolkit: React.FC = () => {
   // Grounding Step
   const [groundingStep, setGroundingStep] = useState(0);
   const GROUNDING_STEPS = [
-    { count: '5', sense: 'Things you can SEE', desc: 'Look around your desk or room: a notebook, a pen, light through the window...' },
-    { count: '4', sense: 'Things you can TOUCH', desc: 'Feel the texture of your sweater, your desk surface, the floor under your feet...' },
-    { count: '3', sense: 'Things you can HEAR', desc: 'Listen closely: the hum of a fan, distant footsteps outside, your own breathing...' },
-    { count: '2', sense: 'Things you can SMELL', desc: 'Notice any scent in the air: coffee, pencil wood, clean air...' },
-    { count: '1', sense: 'Thing you can TASTE', desc: 'Notice the lingering taste of water or mint, or take a refreshing sip now.' }
+    { count: '5', sense: 'Things you can SEE', desc: 'Look around quietly: the grain of your desk, light through a window, a book...' },
+    { count: '4', sense: 'Things you can TOUCH', desc: 'Notice physical sensations: the weight of your feet on the floor, your sleeves, the air on your skin...' },
+    { count: '3', sense: 'Things you can HEAR', desc: 'Listen gently: distant hums, quiet breeze outside, your own breathing...' },
+    { count: '2', sense: 'Things you can SMELL', desc: 'Notice any subtle scents in the room: fresh paper, clean air, tea...' },
+    { count: '1', sense: 'Thing you can TASTE', desc: 'Notice the lingering taste of cool water or take a refreshing sip now.' }
   ];
 
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 space-y-6 animate-fade-in">
+    <div className="flex-1 flex flex-col h-screen max-w-5xl mx-auto px-4 sm:px-8 py-6 overflow-y-auto space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
-            Self-Regulation & Healthy Routines
+      <div className="flex items-center justify-between pb-4 border-b border-[#EAE4DC]/60 shrink-0">
+        <div className="flex items-center gap-3">
+          {onOpenMobileSidebar && (
+            <button
+              onClick={onOpenMobileSidebar}
+              className="p-1.5 rounded-lg text-[#78726A] hover:bg-[#F4EFEA] md:hidden"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+          <span className="text-xs font-semibold tracking-[0.18em] text-[#78726A] uppercase">
+            YOUR SPACE · CALM TOOLKIT
           </span>
-          <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-800 mt-2">
-            Calm & Reset Toolkit
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Proactive micro-interventions for acute nervous system regulation.
-          </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex bg-slate-100 p-1.5 rounded-2xl border border-slate-200/70">
+        <div className="flex bg-[#F4EFEA] p-1 rounded-xl border border-[#EAE4DC]">
           <button
             onClick={() => setActiveExercise('breathing')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
-              activeExercise === 'breathing' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-600'
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition ${
+              activeExercise === 'breathing' ? 'bg-white text-[#2D2A26] font-semibold shadow-2xs' : 'text-[#78726A]'
             }`}
           >
-            Box Breathing
+            Box breathing
           </button>
           <button
             onClick={() => setActiveExercise('grounding')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
-              activeExercise === 'grounding' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-600'
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition ${
+              activeExercise === 'grounding' ? 'bg-white text-[#2D2A26] font-semibold shadow-2xs' : 'text-[#78726A]'
             }`}
           >
             5-4-3-2-1 Grounding
           </button>
           <button
             onClick={() => setActiveExercise('routine')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition ${
-              activeExercise === 'routine' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-600'
+            className={`px-3 py-1 rounded-lg text-xs font-medium transition ${
+              activeExercise === 'routine' ? 'bg-white text-[#2D2A26] font-semibold shadow-2xs' : 'text-[#78726A]'
             }`}
           >
-            Study Reset
+            Sleep habits
           </button>
         </div>
       </div>
 
-      {/* Main Exercise Display */}
+      {/* Page Title */}
+      <div>
+        <h2 className="font-serif text-3xl sm:text-4xl text-[#2D2A26] font-normal tracking-tight">
+          Gentle Reset & Grounding
+        </h2>
+        <p className="font-sans text-sm text-[#78726A] font-light mt-1.5">
+          Quiet micro-practices to ease nervous system tension
+        </p>
+      </div>
+
+      {/* Main Exercise Content */}
       {activeExercise === 'breathing' && (
-        <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200/80 shadow-xs flex flex-col items-center justify-center text-center space-y-6">
+        <div className="bg-white rounded-2xl p-8 sm:p-12 border border-[#EAE4DC] shadow-2xs flex flex-col items-center justify-center text-center space-y-6">
           <div className="max-w-md">
-            <h3 className="font-display font-bold text-xl text-slate-800">
+            <h3 className="font-serif font-medium text-xl text-[#2D2A26]">
               4-4-4-4 Box Breathing
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Physiologically resets elevated heart rates and releases adrenaline during high-stress study sessions.
+            <p className="text-xs text-[#78726A] font-light mt-1">
+              Slow, balanced breathing to signal safety to your body during study stress.
             </p>
           </div>
 
-          {/* Interactive Breathing Visualizer */}
-          <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center my-6">
-            {/* Animated Outer Pulse */}
+          {/* Calming Breathing Circle */}
+          <div className="relative w-56 h-56 flex items-center justify-center my-4">
             <div
               className={`absolute rounded-full transition-all duration-1000 ${
                 isBreathingActive
                   ? breathingPhase === 'Inhale'
-                    ? 'w-72 h-72 sm:w-80 sm:h-80 bg-teal-400/20 scale-110'
+                    ? 'w-56 h-56 bg-[#F3ECF8] scale-110'
                     : breathingPhase === 'Exhale'
-                    ? 'w-52 h-52 sm:w-60 sm:h-60 bg-purple-400/20 scale-95'
-                    : 'w-64 h-64 sm:w-72 sm:h-72 bg-sky-400/20'
-                  : 'w-56 h-56 bg-slate-100'
+                    ? 'w-40 h-40 bg-[#F2F8F8] scale-90'
+                    : 'w-48 h-48 bg-[#F3ECF8]'
+                  : 'w-44 h-44 bg-[#F4EFEA]'
               }`}
             />
 
-            {/* Main Center Circle */}
             <div
-              className={`relative z-10 w-48 h-48 sm:w-56 sm:h-56 rounded-full flex flex-col items-center justify-center text-white shadow-xl transition-all duration-1000 ${
+              className={`relative z-10 w-36 h-36 rounded-full flex flex-col items-center justify-center text-white transition-all duration-1000 ${
                 isBreathingActive
                   ? breathingPhase === 'Inhale'
-                    ? 'bg-gradient-to-tr from-teal-600 to-emerald-500 scale-105'
+                    ? 'bg-[#3D706E] scale-105'
                     : breathingPhase === 'Hold'
-                    ? 'bg-gradient-to-tr from-sky-600 to-teal-500 scale-105'
+                    ? 'bg-[#457B79] scale-105'
                     : breathingPhase === 'Exhale'
-                    ? 'bg-gradient-to-tr from-purple-600 to-indigo-500 scale-95'
-                    : 'bg-gradient-to-tr from-indigo-500 to-teal-600 scale-95'
-                  : 'bg-teal-700'
+                    ? 'bg-[#644D73] scale-95'
+                    : 'bg-[#7E6390] scale-95'
+                  : 'bg-[#2F5957]'
               }`}
             >
-              <Wind className="w-8 h-8 mb-1 opacity-90" />
-              <div className="font-display font-bold text-2xl">
+              <Wind className="w-5 h-5 mb-1 opacity-80" />
+              <div className="font-serif text-lg font-medium">
                 {isBreathingActive ? breathingPhase : 'Ready'}
               </div>
-              <div className="text-xs font-semibold opacity-80 mt-0.5">
-                {isBreathingActive ? `${breathingTimer}s` : '4 seconds each'}
+              <div className="text-[11px] opacity-75 font-light">
+                {isBreathingActive ? `${breathingTimer}s` : '4s pace'}
               </div>
             </div>
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setIsBreathingActive(!isBreathingActive)}
-              className="flex items-center gap-2 px-6 py-3 bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm rounded-2xl shadow-md transition"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2F5957] hover:bg-[#234442] text-white text-xs font-medium rounded-xl transition shadow-2xs"
             >
-              {isBreathingActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              <span>{isBreathingActive ? 'Pause Exercise' : 'Begin Breathing Cycle'}</span>
+              {isBreathingActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              <span>{isBreathingActive ? 'Pause' : 'Begin Breathing'}</span>
             </button>
             <button
               onClick={() => {
@@ -151,57 +165,54 @@ export const WellnessToolkit: React.FC = () => {
                 setBreathingPhase('Inhale');
                 setBreathingTimer(4);
               }}
-              className="p-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl transition"
+              className="p-2.5 bg-[#F4EFEA] hover:bg-[#ECE4DC] text-[#78726A] rounded-xl transition"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
       )}
 
       {activeExercise === 'grounding' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-xs space-y-6">
-          <div className="max-w-xl">
-            <h3 className="font-display font-bold text-xl text-slate-800">
-              5-4-3-2-1 Sensory Grounding Technique
+        <div className="bg-white rounded-2xl p-6 sm:p-10 border border-[#EAE4DC] shadow-2xs space-y-6">
+          <div className="max-w-md">
+            <h3 className="font-serif font-medium text-xl text-[#2D2A26]">
+              5-4-3-2-1 Sensory Grounding
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Brings your attention out of racing thoughts and returns your sensory awareness into the present physical room.
+            <p className="text-xs text-[#78726A] font-light mt-1">
+              Gently brings your attention back to your physical surroundings when thoughts start racing.
             </p>
           </div>
 
-          <div className="bg-gradient-to-tr from-sky-50 to-teal-50/50 p-6 sm:p-8 rounded-3xl border border-sky-100 flex flex-col items-center text-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-sky-600 text-white flex items-center justify-center font-display font-black text-3xl shadow-md">
+          <div className="bg-[#FAF7F2] p-6 sm:p-8 rounded-2xl border border-[#EAE4DC] flex flex-col items-center text-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-[#3D706E] text-white flex items-center justify-center font-serif text-xl font-medium">
               {GROUNDING_STEPS[groundingStep].count}
             </div>
 
-            <div>
-              <h4 className="font-display font-extrabold text-xl text-slate-800">
-                {GROUNDING_STEPS[groundingStep].sense}
-              </h4>
-              <p className="text-sm text-slate-600 mt-2 max-w-md">
-                {GROUNDING_STEPS[groundingStep].desc}
-              </p>
-            </div>
+            <h4 className="font-serif text-lg font-medium text-[#2D2A26]">
+              {GROUNDING_STEPS[groundingStep].sense}
+            </h4>
+            <p className="text-xs sm:text-sm text-[#78726A] max-w-sm font-light leading-relaxed">
+              {GROUNDING_STEPS[groundingStep].desc}
+            </p>
 
-            <div className="flex items-center gap-3 mt-4">
+            <div className="flex items-center gap-2 mt-3">
               <button
                 onClick={() => setGroundingStep((prev) => Math.max(0, prev - 1))}
                 disabled={groundingStep === 0}
-                className="px-4 py-2 bg-white disabled:opacity-40 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold"
+                className="px-3.5 py-1.5 bg-white disabled:opacity-30 border border-[#EAE4DC] text-[#78726A] rounded-xl text-xs font-medium"
               >
                 Previous
               </button>
-
               <button
                 onClick={() =>
                   setGroundingStep((prev) =>
                     prev < GROUNDING_STEPS.length - 1 ? prev + 1 : 0
                   )
                 }
-                className="px-6 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-semibold shadow-md transition"
+                className="px-4 py-1.5 bg-[#2F5957] hover:bg-[#234442] text-white rounded-xl text-xs font-medium transition"
               >
-                {groundingStep < GROUNDING_STEPS.length - 1 ? 'Next Sense' : 'Complete & Grounded'}
+                {groundingStep < GROUNDING_STEPS.length - 1 ? 'Next' : 'Complete'}
               </button>
             </div>
           </div>
@@ -209,45 +220,38 @@ export const WellnessToolkit: React.FC = () => {
       )}
 
       {activeExercise === 'routine' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-4">
+        <div className="bg-white rounded-2xl p-6 border border-[#EAE4DC] shadow-2xs space-y-4">
           <div>
-            <h3 className="font-display font-bold text-xl text-slate-800">
-              Student Routine & Sleep Reset Checklist
+            <h3 className="font-serif font-medium text-xl text-[#2D2A26]">
+              Rest & Evening Pacing
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Proactive habits to protect your cognitive energy during busy semesters.
+            <p className="text-xs text-[#78726A] font-light mt-0.5">
+              Practical, gentle boundaries to protect student energy
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
             {[
               {
-                title: 'The 20-Minute Study Break Rule',
-                desc: 'Every 50 minutes of deep study, step away from screens for 10 minutes. Look at trees or daylight to un-fatigue your optic nerve.',
-                icon: '🌿'
+                title: 'The 10-Minute Screen Unplug',
+                desc: 'Every hour of laptop study, look outside at the horizon or greenery to relax eye strain and mental fatigue.'
               },
               {
-                title: 'Bedtime Screen Curfew (30 Mins)',
-                desc: 'Blue light from laptops suppresses melatonin. Switch your devices to Night Shift or reading mode by 11:30 PM.',
-                icon: '🌙'
+                title: 'Paper Brain Dump',
+                desc: 'Write tomorrow’s loose ends on an index card before bed. Your mind stops looping them once they are on paper.'
               },
               {
-                title: 'Brain Dump Micro-Journaling',
-                desc: 'Before sleeping, write down every pending assignment or deadline on paper. Once externalized, your mind stops looping them.',
-                icon: '📝'
+                title: 'Warm Drink Wind-Down',
+                desc: 'Swap late-night coffee with warm water or chamomile tea after 10 PM to allow cortisol to settle.'
               },
               {
-                title: 'Hydration & Campus Walk',
-                desc: 'Drink at least 2 liters of water daily. A brisk 15-minute campus walk lowers cortisol levels significantly.',
-                icon: '💧'
+                title: 'Fresh Air Campus Walk',
+                desc: 'A gentle 15-minute walk outside without headphones resets your circadian rhythm.'
               }
             ].map((habit, idx) => (
-              <div key={idx} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex gap-3">
-                <span className="text-2xl shrink-0">{habit.icon}</span>
-                <div>
-                  <h4 className="font-bold text-sm text-slate-800">{habit.title}</h4>
-                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">{habit.desc}</p>
-                </div>
+              <div key={idx} className="p-4 rounded-xl bg-[#FAF7F2] border border-[#EAE4DC]/70">
+                <h4 className="font-medium text-xs sm:text-sm text-[#2D2A26]">{habit.title}</h4>
+                <p className="text-xs text-[#78726A] font-light mt-1 leading-relaxed">{habit.desc}</p>
               </div>
             ))}
           </div>
