@@ -8,9 +8,11 @@ import {
   PhoneCall,
   ShieldAlert,
   Menu,
-  ChevronDown
+  ChevronDown,
+  Plus,
+  MessageSquareText,
 } from 'lucide-react';
-import { ChatMessage, Language, PrimaryEmotion } from '../types';
+import { ChatMessage, Language, PrimaryEmotion, ChatSession } from '../types';
 import { cadberryAI } from '../services/cadberryAI';
 import { voiceService } from '../services/voiceService';
 import { SUPPORTED_LANGUAGES } from '../services/languageConfig';
@@ -21,6 +23,16 @@ interface CadberryCheckInViewProps {
   onCheckInCompleted?: (note: string) => void;
   onOpenCrisisModal: () => void;
   onOpenMobileSidebar: () => void;
+  username?: string | null;
+  chatSessions?: ChatSession[];
+  activeChatId?: string | null;
+  chatMessages?: ChatMessage[];
+  chatLoading?: boolean;
+  chatError?: string | null;
+  onSelectChat?: (chatId: string) => void;
+  onCreateNewChat?: () => void;
+  onPersistUserMessage?: (text: string, language: Language) => void;
+  onPersistCadberryReply?: (text: string, language: Language) => void;
 }
 
 export const CadberryCheckInView: React.FC<CadberryCheckInViewProps> = ({
@@ -29,6 +41,16 @@ export const CadberryCheckInView: React.FC<CadberryCheckInViewProps> = ({
   onCheckInCompleted,
   onOpenCrisisModal,
   onOpenMobileSidebar,
+  username,
+  chatSessions = [],
+  activeChatId,
+  chatMessages = [],
+  chatLoading = false,
+  chatError = null,
+  onSelectChat,
+  onCreateNewChat,
+  onPersistUserMessage,
+  onPersistCadberryReply,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
@@ -46,6 +68,30 @@ export const CadberryCheckInView: React.FC<CadberryCheckInViewProps> = ({
       language: language,
     },
   ]);
+
+  useEffect(() => {
+    if (chatMessages.length > 0) {
+      setMessages(chatMessages);
+      return;
+    }
+
+    setMessages([
+      {
+        id: 'init-1',
+        sender: 'cadberry',
+        text:
+          language === 'hinglish'
+            ? "Hey there, main Cadberry hoon. Chahe aap exhausted feel kar rahe ho, ya kuch ajeeb lag raha ho — I'm right here with you. Kaise ho aaj?"
+            : language === 'hi'
+            ? "नमस्ते, मैं कैडबरी हूँ। अगर आज मन में कोई भारीपन या सामान्य से अलग महसूस हो रहा है, तो मैं यहाँ आपके साथ हूँ। आज कैसा महसूस हो रहा है?"
+            : language === 'ta'
+            ? "வணக்கம், நான் கேட்பரி. இன்று உங்கள் மனம் சோர்வாகவோ அல்லது இயல்புக்கு மாறாகவோ இருந்தால் தயங்காமல் பகிருங்கள். நான் கேட்கிறேன்."
+            : "Hello, I am Cadberry. Whenever you're feeling weighed down, overwhelmed, or simply feel 'different' and need a quiet space to check in — I am right here with you.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        language,
+      },
+    ]);
+  }, [chatMessages, language]);
 
   const [inputText, setInputText] = useState('');
   const [isListening, setIsListening] = useState(false);
@@ -135,6 +181,7 @@ export const CadberryCheckInView: React.FC<CadberryCheckInViewProps> = ({
       };
 
       setMessages((prev) => [...prev, cadberryMsg]);
+      onPersistCadberryReply?.(result.text, language);
 
       if (onCheckInCompleted) {
         onCheckInCompleted(textToSend);
@@ -225,7 +272,7 @@ export const CadberryCheckInView: React.FC<CadberryCheckInViewProps> = ({
     SUPPORTED_LANGUAGES.find((l) => l.code === language)?.label.toUpperCase() || 'ENGLISH';
 
   return (
-    <div className="flex-1 flex flex-col h-screen max-w-4xl mx-auto px-4 sm:px-8 py-6 overflow-hidden">
+    <div className="flex-1 flex flex-col h-screen max-w-6xl mx-auto px-4 sm:px-8 py-6 overflow-hidden">
       {/* Top Header: CHECK-IN · LANGUAGE */}
       <header className="flex items-center justify-between pb-4 border-b border-[#EAE4DC]/60 shrink-0">
         <div className="flex items-center gap-3">
@@ -241,6 +288,17 @@ export const CadberryCheckInView: React.FC<CadberryCheckInViewProps> = ({
               CHECK-IN · {currentLanguageLabel}
             </span>
           </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onCreateNewChat}
+            className="inline-flex items-center gap-2 rounded-full border border-[#E7DFC9] bg-white px-3 py-1.5 text-[11px] font-medium text-[#2D2A26] shadow-sm transition hover:bg-[#F7F3EE]"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New Chat
+          </button>
         </div>
 
         {/* Top Right Controls */}
@@ -280,12 +338,42 @@ export const CadberryCheckInView: React.FC<CadberryCheckInViewProps> = ({
         </div>
       </header>
 
-      {/* Scrollable Conversation Stream */}
-      <div className="flex-1 overflow-y-auto py-6 space-y-6 pr-1">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-5 py-6">
+        <aside className="w-full md:w-56 lg:w-64 shrink-0 rounded-2xl border border-[#EAE4DC] bg-white/60 p-3">
+          <div className="flex items-center gap-2 px-2 pb-3">
+            <MessageSquareText className="h-4 w-4 text-[#3D706E]" />
+            <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#78726A]">
+              Chat history
+            </h3>
+          </div>
+          <div className="max-h-32 space-y-1 overflow-y-auto md:max-h-none md:h-[calc(100vh-13rem)]">
+            {chatSessions.length > 0 ? (
+              chatSessions.map((chat) => (
+                <button
+                  key={chat.id}
+                  type="button"
+                  onClick={() => onSelectChat?.(chat.id)}
+                  className={`w-full rounded-xl px-3 py-2.5 text-left text-xs transition ${
+                    chat.id === activeChatId
+                      ? 'border border-[#D7C6E4] bg-[#F3ECF8] text-[#4B3857]'
+                      : 'border border-transparent text-[#78726A] hover:border-[#EAE4DC] hover:bg-[#FAF7F2]'
+                  }`}
+                >
+                  <span className="block truncate font-medium">{chat.title}</span>
+                </button>
+              ))
+            ) : (
+              <p className="px-2 py-3 text-xs italic text-[#A69F96]">No chats yet.</p>
+            )}
+          </div>
+        </aside>
+
+        {/* Scrollable Conversation Stream */}
+        <div className="min-w-0 flex-1 overflow-y-auto space-y-6 pr-1">
         {/* Large Editorial Serif Heading */}
         <div className="pt-2">
           <h2 className="font-serif text-3xl sm:text-4xl text-[#2D2A26] font-normal tracking-tight">
-            I don't feel so well
+            Hello, {username || 'there'}
           </h2>
           <p className="font-sans text-sm sm:text-base text-[#78726A] font-light mt-1.5">
             a private space to slow down and check in with yourself
@@ -408,6 +496,7 @@ export const CadberryCheckInView: React.FC<CadberryCheckInViewProps> = ({
           )}
 
           <div ref={messagesEndRef} />
+        </div>
         </div>
       </div>
 

@@ -1,5 +1,85 @@
 import { DistressMetrics, Language, PrimaryEmotion, StudentCheckIn } from '../types';
 
+export function deriveCheckInAnalytics(rawText: string, language: Language): Pick<StudentCheckIn, 'stressScore' | 'sleepHours' | 'emotion'> {
+  const text = (rawText || '').toLowerCase();
+  const isEnglishLike = language === 'en' || language === 'hinglish';
+
+  let stressScore = 5;
+  let sleepHours: number | undefined;
+  let emotion: PrimaryEmotion = 'Grounded';
+
+  const sleepPatterns = [
+    { pattern: /(didn['’]t sleep|no sleep|not slept|awake all night|insomnia|couldn['’]t sleep|bad sleep|sleep deprived)/i, value: 3 },
+    { pattern: /(slept well|well rested|good sleep|rested well|sleeping better|got some sleep)/i, value: 8 },
+    { pattern: /(slept\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten))\s*hours?/i, value: null },
+    { pattern: /(\b\d\b|\b\d\.\d\b)\s*hours?\s*of sleep/i, value: null }
+  ];
+
+  for (const entry of sleepPatterns) {
+    const match = text.match(entry.pattern as RegExp);
+    if (!match) continue;
+
+    if (entry.value !== null) {
+      sleepHours = entry.value;
+      break;
+    }
+
+    const numericMatch = text.match(/(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s*hours?\s*of sleep|slept\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s*hours?/i);
+    if (numericMatch) {
+      const extracted = numericMatch[1] || numericMatch[2] || '0';
+      const normalized = Number.parseFloat(extracted);
+      if (!Number.isNaN(normalized)) {
+        sleepHours = normalized;
+      }
+      break;
+    }
+  }
+
+  if (/overwhelmed|panic|spiraling|burnt out|too much|everything feels heavy|paralyzed|hopeless|crushing/i.test(text)) {
+    emotion = 'Overwhelmed';
+    stressScore = 8;
+  } else if (/anxious|worried|nervous|racing thoughts|tense|stressed|deadline|assignment|exam|submission/i.test(text)) {
+    emotion = 'Anxious';
+    stressScore = 7;
+  } else if (/exhausted|tired|drained|no sleep|awake all night|can['’]t keep my eyes open|sleep deprived|worn out/i.test(text)) {
+    emotion = 'Exhausted';
+    stressScore = 8;
+  } else if (/lonely|alone|isolated|no one understands|left out|empty/i.test(text)) {
+    emotion = 'Lonely';
+    stressScore = 6;
+  } else if (/hopeful|better|relieved|lighter|managed|okay|ok|more calm|peaceful|felt better/i.test(text)) {
+    emotion = 'Hopeful';
+    stressScore = 4;
+  } else if (/restless|can't settle|wired|agitated|can't focus|jittery/i.test(text)) {
+    emotion = 'Restless';
+    stressScore = 6;
+  } else if (/calm|grounded|settled|steady|fine|okay|peaceful|better/i.test(text)) {
+    emotion = 'Calm';
+    stressScore = 3;
+  } else if (/different|not myself|numb|weird|strange|disconnected|empty/i.test(text)) {
+    emotion = 'Grounded';
+    stressScore = 5;
+  }
+
+  if (!isEnglishLike && /मैं|हूँ|तुम|आज|बहुत|थका|उदास|चिंता|नींद|घबराहट|अकेल|शांत/i.test(text)) {
+    if (/बहुत|अकेल|घबराहट|चिंता|असहज|तंग|उदास|अव्यवस्था|बेकरार/i.test(text)) {
+      stressScore = Math.max(stressScore, 7);
+      emotion = 'Anxious';
+    }
+    if (/नींद|सोया|स्लीप|अचानक जाग|सुबह|थकान|उम्मीद|ठीक/i.test(text)) {
+      const sleepMatch = text.match(/(\d+)\s*(घंटे|hours?|hr|hrs)|नींद\s*(कम|बुरी|अच्छी)|सॉरी|स्लीप/i);
+      if (sleepMatch) {
+        const parsed = Number.parseFloat(sleepMatch[1] || '0');
+        if (!Number.isNaN(parsed) && parsed > 0) {
+          sleepHours = parsed;
+        }
+      }
+    }
+  }
+
+  return { stressScore: Math.max(1, Math.min(10, stressScore)), sleepHours, emotion };
+}
+
 const STORAGE_KEY_CHECKINS = 'cadberry_student_checkins_v1';
 const STORAGE_KEY_API_KEY = 'cadberry_gemini_api_key';
 

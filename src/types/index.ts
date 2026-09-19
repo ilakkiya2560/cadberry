@@ -41,12 +41,33 @@ export interface ChatMessage {
   audioDurationSeconds?: number;
 }
 
+export interface ChatSession {
+  id: string;
+  user_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  is_archived: boolean;
+}
+
+export interface PersistedChatMessage {
+  id: string;
+  chat_id: string;
+  user_id: string;
+  sender: 'user' | 'cadberry';
+  content: string;
+  created_at: string;
+  message_order: number;
+  language?: string | null;
+  metadata?: Record<string, any> | null;
+}
+
 export interface StudentCheckIn {
   id: string;
   date: string; // ISO format
   dayLabel: string; // "Mon", "Tue"
   stressScore: number; // 1-10
-  sleepHours: number;
+  sleepHours?: number;
   emotion: PrimaryEmotion;
   note: string;
   language: Language;

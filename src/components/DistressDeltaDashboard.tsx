@@ -203,7 +203,7 @@ export const DistressDeltaDashboard: React.FC<DistressDeltaDashboardProps> = ({
         <div className="h-52 flex items-end justify-between gap-2 sm:gap-4 pt-6 pb-2 border-b border-[#EAE4DC]">
           {checkIns.map((item, idx) => {
             const stressHeight = (item.stressScore / 10) * 100;
-            const sleepHeight = (item.sleepHours / 10) * 100;
+            const sleepHeight = item.sleepHours == null ? 0 : (item.sleepHours / 10) * 100;
 
             return (
               <div key={item.id || idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group relative">
@@ -211,7 +211,7 @@ export const DistressDeltaDashboard: React.FC<DistressDeltaDashboardProps> = ({
                 <div className="absolute bottom-full mb-1.5 hidden group-hover:flex flex-col bg-[#2D2A26] text-white text-[11px] rounded-lg p-2 shadow-lg z-20 w-40 pointer-events-none">
                   <div className="font-medium">{item.dayLabel}</div>
                   <div className="text-[#99F6E4]">Stress: {item.stressScore} / 10</div>
-                  <div className="text-[#EADDF2]">Sleep: {item.sleepHours} hrs</div>
+                  <div className="text-[#EADDF2]">Sleep: {item.sleepHours ?? '—'} hrs</div>
                   {item.note && <div className="text-[#C8BBAA] mt-1 text-[10px] truncate">"{item.note}"</div>}
                 </div>
 
@@ -223,7 +223,7 @@ export const DistressDeltaDashboard: React.FC<DistressDeltaDashboardProps> = ({
                   />
                   <div
                     style={{ height: `${sleepHeight}%` }}
-                    className="w-2.5 sm:w-4 bg-[#C1A2D6] rounded-t-xs transition-all duration-300"
+                    className={`w-2.5 sm:w-4 rounded-t-xs transition-all duration-300 ${item.sleepHours == null ? 'bg-[#EAE4DC]' : 'bg-[#C1A2D6]'}`}
                   />
                 </div>
 
@@ -268,7 +268,7 @@ export const DistressDeltaDashboard: React.FC<DistressDeltaDashboardProps> = ({
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-[#A69F96] block">Sleep</span>
-                  <span className="font-medium text-[#2D2A26]">{record.sleepHours}h</span>
+                  <span className="font-medium text-[#2D2A26]">{record.sleepHours == null ? '—' : `${record.sleepHours}h`}</span>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] text-[#A69F96] block">Delta</span>
