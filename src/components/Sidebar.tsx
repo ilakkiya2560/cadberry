@@ -1,10 +1,10 @@
 import React from 'react';
-import { MessageSquare, LineChart, HeartHandshake, Shield, Sparkles, Wind, X } from 'lucide-react';
+import { MessageSquare, LineChart, HeartHandshake, Shield, Sparkles, Wind, X, Heart } from 'lucide-react';
 import { StudentCheckIn } from '../types';
 
 interface SidebarProps {
-  currentTab: 'checkin' | 'patterns' | 'support' | 'toolkit';
-  onSelectTab: (tab: 'checkin' | 'patterns' | 'support' | 'toolkit') => void;
+  currentTab: 'checkin' | 'patterns' | 'coping' | 'support' | 'toolkit';
+  onSelectTab: (tab: 'checkin' | 'patterns' | 'coping' | 'support' | 'toolkit') => void;
   recentCheckIns: StudentCheckIn[];
   isMobileOpen: boolean;
   onCloseMobile: () => void;
@@ -97,6 +97,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 />
                 <LineChart className="w-4 h-4 text-[#78726A]" />
                 <span>My patterns</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  onSelectTab('coping');
+                  onCloseMobile();
+                }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition text-left ${
+                  currentTab === 'coping'
+                    ? 'bg-[#FAF7F2] text-[#2D2A26] font-semibold shadow-2xs border border-[#EAE4DC]/60'
+                    : 'text-[#78726A] hover:text-[#2D2A26] hover:bg-[#FAF7F2]/60'
+                }`}
+              >
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    currentTab === 'coping' ? 'bg-[#3D706E]' : 'bg-transparent'
+                  }`}
+                />
+                <Heart className="w-4 h-4 text-[#78726A]" />
+                <span>Coping strategies</span>
               </button>
 
               <button

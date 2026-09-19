@@ -131,6 +131,7 @@ export const CadberryCheckInView: React.FC<CadberryCheckInViewProps> = ({
     };
 
     setMessages((prev) => [...prev, userMsg]);
+    onPersistUserMessage?.(textToSend.trim(), language);
     setInputText('');
     setInterimTranscript('');
     setIsThinking(true);

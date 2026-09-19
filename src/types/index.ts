@@ -50,6 +50,14 @@ export interface ChatSession {
   is_archived: boolean;
 }
 
+export interface UserPreference {
+  id: string;
+  user_id: string;
+  preference: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PersistedChatMessage {
   id: string;
   chat_id: string;

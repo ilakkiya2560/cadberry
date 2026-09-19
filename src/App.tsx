@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Language, StudentCheckIn, ChatSession, ChatMessage as AppChatMessage } from './types';
+import { Language, StudentCheckIn, ChatSession, ChatMessage as AppChatMessage, UserPreference } from './types';
 import { Sidebar } from './components/Sidebar';
 import { CadberryCheckInView } from './components/CadberryCheckInView';
 import { DistressDeltaDashboard } from './components/DistressDeltaDashboard';
@@ -7,6 +7,7 @@ import { PeerCircles } from './components/PeerCircles';
 import { WellnessToolkit } from './components/WellnessToolkit';
 import { VoiceCheckInModal } from './components/VoiceCheckInModal';
 import { CrisisHelplineModal } from './components/CrisisHelplineModal';
+import { CopingStrategiesView } from './components/CopingStrategiesView';
 import { AuthPage } from './components/AuthPage';
 import { supabase } from './lib/supabase';
 import {
@@ -22,10 +23,16 @@ import {
   computeDistressMetrics,
   deriveCheckInAnalytics,
 } from './services/storageService';
+import {
+  addUserPreference,
+  extractPreferences,
+  getUserPreferences,
+  removeUserPreference,
+} from './services/preferenceService';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<
-    'checkin' | 'patterns' | 'support' | 'toolkit'
+    'checkin' | 'patterns' | 'coping' | 'support' | 'toolkit'
   >('checkin');
 
   const [selectedLanguage, setSelectedLanguage] =
@@ -36,6 +43,7 @@ export const App: React.FC = () => {
   const [sessionReady, setSessionReady] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [profileName, setProfileName] = useState<string | null>(null);
+  const [preferences, setPreferences] = useState<UserPreference[]>([]);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<AppChatMessage[]>([]);
@@ -74,6 +82,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (!user?.id) {
       setProfileName(null);
+      setPreferences([]);
       setChatSessions([]);
       setActiveChatId(null);
       setChatMessages([]);
@@ -94,6 +103,16 @@ export const App: React.FC = () => {
     };
 
     void loadChats();
+
+    const loadPreferences = async () => {
+      try {
+        setPreferences(await getUserPreferences(user.id));
+      } catch (error) {
+        console.error('Failed to load user preferences:', error);
+      }
+    };
+
+    void loadPreferences();
   }, [user?.id]);
 
   useEffect(() => {
@@ -191,6 +210,19 @@ export const App: React.FC = () => {
     if (!user?.id || !activeChatId) return;
 
     try {
+      const detectedPreferences = extractPreferences(text);
+      for (const detected of detectedPreferences) {
+        try {
+          const savedPreference = await addUserPreference(user.id, detected);
+          setPreferences((prev) => [
+            savedPreference,
+            ...prev.filter((item) => item.preference !== savedPreference.preference),
+          ]);
+        } catch (preferenceError) {
+          console.error('Failed to save detected preference:', preferenceError);
+        }
+      }
+
       await saveMessage({
         chatId: activeChatId,
         userId: user.id,
@@ -210,6 +242,17 @@ export const App: React.FC = () => {
     } catch (error) {
       console.error('Failed to persist user message:', error);
       setChatError('Your message was sent, but saving it failed.');
+    }
+  };
+
+  const handleRemovePreference = async (preference: string) => {
+    if (!user?.id) return;
+
+    try {
+      await removeUserPreference(user.id, preference);
+      setPreferences((prev) => prev.filter((item) => item.preference !== preference));
+    } catch (error) {
+      console.error('Failed to remove preference:', error);
     }
   };
 
@@ -294,6 +337,16 @@ export const App: React.FC = () => {
             metrics={metrics}
             onOpenCheckInModal={() => setIsVoiceModalOpen(true)}
             onOpenBreathingModal={() => setCurrentTab('toolkit')}
+            onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
+          />
+        )}
+
+        {currentTab === 'coping' && (
+          <CopingStrategiesView
+            checkIns={checkIns}
+            metrics={metrics}
+            preferences={preferences}
+            onRemovePreference={handleRemovePreference}
             onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
           />
         )}
